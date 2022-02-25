@@ -7,6 +7,7 @@ from . import (
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
+
 @click.group(invoke_without_command=True)
 @click.help_option("-h", "--help")
 @click.version_option(
@@ -28,5 +29,3 @@ def cli(ctx):
 # 以上是主命令
 ############
 # 以下是子命令
-
-

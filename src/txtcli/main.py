@@ -1,3 +1,4 @@
+from email.policy import default
 import click
 
 from txtcli.util import (
@@ -51,8 +52,7 @@ def cli(ctx: click.Context):
     https://pypi.org/project/txtcli/
     """
     if ctx.invoked_subcommand is None:
-        cfg = load_cfg()
-        err = get_txt(cfg)
+        err = get_txt()
         if err:
             click.echo(err)
         ctx.exit()
@@ -84,6 +84,27 @@ def getkey(ctx: click.Context):
     """Get the secret key. (获取日常操作密钥)"""
     pwd = click.prompt("master password", hide_input=True)
     err = get_key(pwd)
+    if err:
+        click.echo(err)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.option("perm", "-p", "--perm", is_flag=True, help="get permanent key")
+@click.option("index", "-from", "--start-from", type=int, default=1, help="start from the index")
+@click.argument("n", nargs=1, type=int, default=0)
+@click.pass_context
+def list(ctx: click.Context, perm:bool, index:int, n: int):
+    """List out temporary messages. 
+    
+    列出最近 N 条消息, 默认列出暂存消息，可使用 -p 列出永久消息。
+    
+    Example 1: txt list
+
+    Example 2: txt list -p 10
+    """
+    bucket = perm_bucket if perm else temp_bucket
+    err = get_txt(bucket, index, n)
     if err:
         click.echo(err)
     ctx.exit()

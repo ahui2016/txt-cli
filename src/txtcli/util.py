@@ -61,10 +61,15 @@ def get_key(pwd: str) -> ErrMsg:
 
 
 def get_txt(
-    cfg: TxtConfig, bucket: str = temp_bucket, index: int = 1, limit: int = 0
+    bucket: str = temp_bucket, index: int = 1, limit: int = 0
 ) -> ErrMsg:
-    if limit == 0:
+    cfg = load_cfg()
+    if index <= 1:
+        index = 1
+    if limit <= 0:
         limit = cfg["txt_default"]
+    if bucket != perm_bucket:
+        bucket = temp_bucket
 
     r = requests.post(
         urljoin(cfg["server"], "/cli/get-more-items"),

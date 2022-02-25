@@ -5,10 +5,13 @@ from pathlib import Path
 from typing import cast
 from appdirs import AppDirs
 from urllib.parse import urljoin
-from txtcli.model import ErrMsg, SecretKey, TxtConfig
+from txtcli.model import ErrMsg, SecretKey, TxtConfig, TxtMsg
 
 DateFormat = "YYYY-MM-DD"
 cfg_file_name = "txt-config.json"
+
+temp_bucket = "temporary-bucket"
+perm_bucket = "permanent-bucket"
 
 app_dirs = AppDirs("txt-cli", "github-ahui2016")
 app_config_dir = Path(app_dirs.user_config_dir)
@@ -23,7 +26,7 @@ def init_cfg() -> None:
                 server="https://txt-demo.ai42.xyz",
                 secret_key="",
                 txt_default=5,
-                txt_list_default=10,
+                txt_list_default=9,
             )
             json.dump(cfg, f, indent=4, ensure_ascii=False)
 
@@ -49,9 +52,37 @@ def get_key(pwd: str) -> ErrMsg:
     if cfg["secret_key"] != key["Key"]:
         cfg["secret_key"] = key["Key"]
         update_cfg(cfg)
-    
+
     keyStarts = arrow.get(key["Starts"]).format(DateFormat)
     keyExpires = arrow.get(key["Expires"]).format(DateFormat)
     status = "有效" if key["IsGood"] else "已过期"
     print(f"获取密钥成功, 有效期 {keyStarts} 至 {keyExpires}, 状态:{status}")
+    return None
+
+
+def get_txt(
+    cfg: TxtConfig, bucket: str = temp_bucket, index: int = 1, limit: int = 0
+) -> ErrMsg:
+    if limit == 0:
+        limit = cfg["txt_default"]
+
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/get-more-items"),
+        data=dict(bucket=bucket, index=index, limit=limit, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    items = cast(list[TxtMsg], r.json())
+    for item in items:
+        item_index = f'{item["Cat"][0]}{item["Index"]}'
+        if item["Alias"]:
+            msg = f"[{item['Alias']}] {item['Msg']}"
+        else:
+            msg = item["Msg"]
+
+        print(f"[{item_index}] [{item['ID']}]")
+        print(msg)
+        print()
+
     return None

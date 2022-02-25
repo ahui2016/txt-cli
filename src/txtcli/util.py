@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import cast
 from appdirs import AppDirs
 from urllib.parse import urljoin
-from txtcli.model import SecretKey, TxtConfig
+from txtcli.model import ErrMsg, SecretKey, TxtConfig
 
 DateFormat = "YYYY-MM-DD"
 cfg_file_name = "txt-config.json"
@@ -38,16 +38,20 @@ def update_cfg(cfg: TxtConfig) -> None:
         json.dump(cfg, f, indent=4, ensure_ascii=False)
 
 
-def get_key(pwd: str) -> None:
+def get_key(pwd: str) -> ErrMsg:
     cfg = load_cfg()
     url = urljoin(cfg["server"], "/auth/get-current-key")
     r = requests.post(url, data={"password": pwd})
     if r.status_code != 200:
-        raise Exception(f"{r.status_code}: {r.text}")
+        return f"{r.status_code}: {r.text}"
+
     key = cast(SecretKey, r.json())
-    cfg["secret_key"] = key["Key"]
-    update_cfg(cfg)
+    if cfg["secret_key"] != key["Key"]:
+        cfg["secret_key"] = key["Key"]
+        update_cfg(cfg)
+    
     keyStarts = arrow.get(key["Starts"]).format(DateFormat)
     keyExpires = arrow.get(key["Expires"]).format(DateFormat)
     status = "有效" if key["IsGood"] else "已过期"
-    print(f"获取密钥成功, 有效期 {keyStarts} 至 {keyExpires}, 状态: {status}")
+    print(f"获取密钥成功, 有效期 {keyStarts} 至 {keyExpires}, 状态:{status}")
+    return None

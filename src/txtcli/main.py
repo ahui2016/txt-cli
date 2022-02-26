@@ -5,6 +5,7 @@ from txtcli.util import (
     get_aliases,
     get_one,
     send_msg,
+    set_alias,
     temp_bucket,
     perm_bucket,
     get_key,
@@ -98,12 +99,12 @@ def getkey(ctx: click.Context):
     ctx.exit()
 
 
-@cli.command(context_settings=CONTEXT_SETTINGS)
+@cli.command(context_settings=CONTEXT_SETTINGS, name="list")
 @click.option("n", "-n", type=int, default=0, help="how many items to show")
 @click.option("alias", "-a", "--alias", is_flag=True, help="show all aliases")
 @click.argument("index", default="t1")
 @click.pass_context
-def list(ctx: click.Context, alias: bool, index: str, n: int):
+def list_command(ctx: click.Context, alias: bool, index: str, n: int):
     """List out messages or aliases.
 
     [INDEX] 的格式是 't1', 't2', 'p1', 'p2'... 依此类推。缺省值是 't1'。
@@ -196,6 +197,39 @@ def toggle(ctx: click.Context, a_or_i: str):
     Example 3: txt toggle my-email (切换别名为 my-email 的类型)
     """
     errMsg = toggle_cat(a_or_i)
+    if errMsg:
+        click.echo(errMsg)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.option("delete", "--delete", is_flag=True, help="delete the alias")
+@click.argument("args", nargs=-1, required=True)
+@click.pass_context
+def alias(ctx: click.Context, delete: bool, args: tuple):
+    """Set or delete the alias of a message.
+
+    设置或删除一条消息的别名。
+
+    [ARGS] 是两个字符串，第一个是索引或旧别名，第二个是新别名。
+
+    Example 1: txt alias t1 my-email (把 't1' 的别名设为 'my-email')
+
+    Example 2: txt alias my-email email (把别名 'my-email' 改为 'email')
+
+    Example 3: txt alias --delete email (删除别名 'email')
+    """
+    if delete:
+        if args and len(args) != 1:
+            click.echo("Error: Argument 'args' takes 1 value when use with '--delete'.")
+            ctx.exit()
+        args = (args[0], "")
+
+    if len(args) != 2:
+        click.echo("Error: Argument 'args' takes 2 values.")
+        ctx.exit()
+
+    errMsg = set_alias(args[0], args[1])
     if errMsg:
         click.echo(errMsg)
     ctx.exit()

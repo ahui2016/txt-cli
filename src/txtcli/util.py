@@ -97,7 +97,7 @@ def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg
     return None
 
 
-def get_one(a_or_i: str) -> ErrMsg:
+def get_one(a_or_i: str, copy: bool = True) -> ErrMsg:
     cfg = load_cfg()
     r = requests.post(
         urljoin(cfg["server"], "/cli/get-by-a-or-i"),
@@ -107,8 +107,11 @@ def get_one(a_or_i: str) -> ErrMsg:
         return f"{r.status_code}: {r.text}"
 
     item = cast(TxtMsg, r.json())
-    pyperclip.copy(item["Msg"])
-    print(item["Msg"])
+    if copy:
+        pyperclip.copy(item["Msg"])
+        print(item["Msg"])
+    else:
+        printTxtMsg(item)
     return None
 
 
@@ -151,3 +154,19 @@ def toggle_cat(a_or_i: str) -> ErrMsg:
     msg = cast(TxtMsg, r.json())
     printTxtMsg(msg)
     return None
+
+
+def set_alias(a_or_i: str, alias: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/set-alias"),
+        data=dict(a_or_i=a_or_i, alias=alias, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    if alias:
+        err = get_one(alias, copy=False)
+    else:
+        err = get_one(a_or_i, copy=False)
+    return err

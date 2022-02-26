@@ -36,3 +36,8 @@ class TxtConfig(TypedDict):
     secret_key: str
     txt_default: int  # 命令 `txt` 默认显示的条数
     txt_list_default: int  # 命令 `txt list` 的 n 参数的默认值
+
+
+class Alias(TypedDict):
+    ID: str  # TxtMsg.Alias
+    MsgID: str

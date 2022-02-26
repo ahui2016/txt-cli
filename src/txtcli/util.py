@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import cast
 from appdirs import AppDirs
 from urllib.parse import urljoin
-from txtcli.model import ErrMsg, SecretKey, TxtConfig, TxtMsg
+from txtcli.model import Alias, ErrMsg, SecretKey, TxtConfig, TxtMsg
 
 DateFormat = "YYYY-MM-DD"
 cfg_file_name = "txt-config.json"
@@ -61,9 +61,7 @@ def get_key(pwd: str) -> ErrMsg:
     return None
 
 
-def get_txt(
-    bucket: str = temp_bucket, index: int = 1, limit: int = 0
-) -> ErrMsg:
+def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg:
     cfg = load_cfg()
     if index <= 1:
         index = 1
@@ -80,18 +78,20 @@ def get_txt(
         return f"{r.status_code}: {r.text}"
 
     items = cast(list[TxtMsg], r.json())
-    for item in items:
-        item_index = f'{item["Cat"][0]}{item["Index"]}'
-        if item["Alias"]:
-            msg = f"[{item['Alias']}] {item['Msg']}"
-        else:
-            msg = item["Msg"]
+    if items is None:
+        return "Not Found (找不到指定消息)"
 
-        print(f"[{item_index}] [{item['ID']}]")
-        print(msg)
+    for item in items:
+        item_title = f'[{item["Cat"][0]}{item["Index"]}] [{item["ID"]}]'
+        if item["Alias"]:
+            item_title += f' [{item["Alias"]}]'
+
+        print(item_title)
+        print(item["Msg"])
         print()
 
     return None
+
 
 def get_one(a_or_i: str) -> ErrMsg:
     cfg = load_cfg()
@@ -105,4 +105,19 @@ def get_one(a_or_i: str) -> ErrMsg:
     item = cast(TxtMsg, r.json())
     pyperclip.copy(item["Msg"])
     print(item["Msg"])
+    return None
+
+
+def get_aliases() -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/get-all-aliases"),
+        data=dict(password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    all = cast(list[Alias], r.json())
+    aliases = [a["ID"] for a in all]
+    print(", ".join(aliases))
     return None

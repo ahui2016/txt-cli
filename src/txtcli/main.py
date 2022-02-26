@@ -3,6 +3,7 @@ import click
 
 from txtcli.util import (
     cfg_path,
+    get_aliases,
     get_one,
     temp_bucket,
     perm_bucket,
@@ -19,6 +20,12 @@ from . import (
 )
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+
+
+def invalid_index(ctx: click.Context, index: str):
+    click.echo(f"'{index}' is not a valid index. (格式错误)")
+    click.echo("Try 'txt list -h' for help.")
+    ctx.exit()
 
 
 def show_where(ctx: click.Context, _, value):
@@ -53,9 +60,9 @@ def cli(ctx: click.Context):
     https://pypi.org/project/txtcli/
     """
     if ctx.invoked_subcommand is None:
-        err = get_txt()
-        if err:
-            click.echo(err)
+        errMsg = get_txt()
+        if errMsg:
+            click.echo(errMsg)
         ctx.exit()
 
 
@@ -84,30 +91,54 @@ def server(ctx: click.Context, server_url: str):
 def getkey(ctx: click.Context):
     """Get the secret key. (获取日常操作密钥)"""
     pwd = click.prompt("master password", hide_input=True)
-    err = get_key(pwd)
-    if err:
-        click.echo(err)
+    errMsg = get_key(pwd)
+    if errMsg:
+        click.echo(errMsg)
     ctx.exit()
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
-@click.option("perm", "-p", "--perm", is_flag=True, help="get permanent key")
-@click.option("index", "-from", "--start-from", type=int, default=1, help="start from the index")
-@click.argument("n", nargs=1, type=int, default=0)
+@click.option("n", "-n", type=int, default=0, help="how many items to show")
+@click.option("alias", "--alias", is_flag=True, help="show all aliases")
+@click.argument("index", default="t1")
 @click.pass_context
-def list(ctx: click.Context, perm:bool, index:int, n: int):
-    """List out temporary messages. 
-    
-    列出最近 N 条消息, 默认列出暂存消息，可使用 -p 列出永久消息。
-    
-    Example 1: txt list
+def list(ctx: click.Context, alias: bool, index: str, n: int):
+    """List out messages or aliases.
 
-    Example 2: txt list -p 10
+    [INDEX] 的格式是 't1', 't2', 'p1', 'p2'... 依此类推。缺省值是 't1'。
+
+    Example 1: txt list (列出最近几条暂存消息)
+
+    Example 2: txt list p1 (列出最近几条永久消息)
+
+    Example 3: txt list p3 -n 5 (从第 3 条永久消息开始，列出 5 条永久消息)
+
+    Example 4: txt list --alias (列出全部别名)
     """
-    bucket = perm_bucket if perm else temp_bucket
-    err = get_txt(bucket, index, n)
-    if err:
-        click.echo(err)
+    if alias:
+        errMsg = get_aliases()
+        if errMsg:
+            click.echo(errMsg)
+        ctx.exit()
+
+    if len(index) < 2:
+        invalid_index(ctx, index)
+
+    if index[0].upper() == "P":
+        bucket = perm_bucket
+    elif index[0].upper() == "T":
+        bucket = temp_bucket
+    else:
+        invalid_index(ctx, index)
+
+    try:
+        i = int(index[1:])
+    except ValueError:
+        invalid_index(ctx, index)
+
+    errMsg = get_txt(bucket, i, n)
+    if errMsg:
+        click.echo(errMsg)
     ctx.exit()
 
 
@@ -116,9 +147,9 @@ def list(ctx: click.Context, perm:bool, index:int, n: int):
 @click.pass_context
 def get(ctx: click.Context, a_or_i: str):
     """Get a message by alias or index.
-    
+
     通过别名或索引获取一条消息 (打印到屏幕并复制到剪贴板), 默认获取 't1'。
-    
+
     Example 1: txt get
 
     Example 2: txt get p1
@@ -129,6 +160,7 @@ def get(ctx: click.Context, a_or_i: str):
     if errMsg:
         click.echo(errMsg, err=True)
     ctx.exit()
+
 
 # 初始化
 init_cfg()

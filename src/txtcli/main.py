@@ -1,16 +1,17 @@
-from email.policy import default
 import click
 
 from txtcli.util import (
     cfg_path,
     get_aliases,
     get_one,
+    send_msg,
     temp_bucket,
     perm_bucket,
     get_key,
     get_txt,
     init_cfg,
     load_cfg,
+    toggle_cat,
     update_cfg,
 )
 
@@ -99,7 +100,7 @@ def getkey(ctx: click.Context):
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.option("n", "-n", type=int, default=0, help="how many items to show")
-@click.option("alias", "--alias", is_flag=True, help="show all aliases")
+@click.option("alias", "-a", "--alias", is_flag=True, help="show all aliases")
 @click.argument("index", default="t1")
 @click.pass_context
 def list(ctx: click.Context, alias: bool, index: str, n: int):
@@ -150,6 +151,8 @@ def get(ctx: click.Context, a_or_i: str):
 
     通过别名或索引获取一条消息 (打印到屏幕并复制到剪贴板), 默认获取 't1'。
 
+    [A_OR_I] 既可以是别名，也可以是索引。
+
     Example 1: txt get
 
     Example 2: txt get p1
@@ -159,6 +162,42 @@ def get(ctx: click.Context, a_or_i: str):
     errMsg = get_one(a_or_i)
     if errMsg:
         click.echo(errMsg, err=True)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("msg", nargs=1, required=True)
+@click.pass_context
+def send(ctx: click.Context, msg: str):
+    """Send a message. (发送一条消息)
+
+    Example: txt send "Hello world!"
+    """
+    errMsg = send_msg(msg)
+    if errMsg:
+        click.echo(errMsg)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("a_or_i", nargs=1, default="t1")
+@click.pass_context
+def toggle(ctx: click.Context, a_or_i: str):
+    """Toggle the category of a message.
+
+    切换一条消息的类型 (暂存/永久), 默认把 T1 切换为 P1。
+
+    [A_OR_I] 既可以是别名，也可以是索引。
+
+    Example 1: txt toggle (把 t1 切换为永久消息)
+
+    Example 2: txt toggle p1 (把 p1 切换为暂存消息)
+
+    Example 3: txt toggle my-email (切换别名为 my-email 的类型)
+    """
+    errMsg = toggle_cat(a_or_i)
+    if errMsg:
+        click.echo(errMsg)
     ctx.exit()
 
 

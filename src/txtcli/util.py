@@ -61,6 +61,16 @@ def get_key(pwd: str) -> ErrMsg:
     return None
 
 
+def printTxtMsg(msg: TxtMsg) -> None:
+    item_title = f'[{msg["Cat"][0]}{msg["Index"]}] [{msg["ID"]}]'
+    if msg["Alias"]:
+        item_title += f' [{msg["Alias"]}]'
+
+    print(item_title)
+    print(msg["Msg"])
+    print()
+
+
 def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg:
     cfg = load_cfg()
     if index <= 1:
@@ -82,13 +92,7 @@ def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg
         return "Not Found (找不到指定消息)"
 
     for item in items:
-        item_title = f'[{item["Cat"][0]}{item["Index"]}] [{item["ID"]}]'
-        if item["Alias"]:
-            item_title += f' [{item["Alias"]}]'
-
-        print(item_title)
-        print(item["Msg"])
-        print()
+        printTxtMsg(item)
 
     return None
 
@@ -120,4 +124,30 @@ def get_aliases() -> ErrMsg:
     all = cast(list[Alias], r.json())
     aliases = [a["ID"] for a in all]
     print(", ".join(aliases))
+    return None
+
+
+def send_msg(msg: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/add"),
+        data=dict(msg=msg, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    return get_txt(limit=1)
+
+
+def toggle_cat(a_or_i: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/toggle-category"),
+        data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    msg = cast(TxtMsg, r.json())
+    printTxtMsg(msg)
     return None

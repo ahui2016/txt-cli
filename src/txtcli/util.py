@@ -1,5 +1,6 @@
 import json
 import arrow
+import pyperclip
 import requests
 from pathlib import Path
 from typing import cast
@@ -90,4 +91,18 @@ def get_txt(
         print(msg)
         print()
 
+    return None
+
+def get_one(a_or_i: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/get-by-a-or-i"),
+        data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    item = cast(TxtMsg, r.json())
+    pyperclip.copy(item["Msg"])
+    print(item["Msg"])
     return None

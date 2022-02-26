@@ -3,6 +3,7 @@ import click
 
 from txtcli.util import (
     cfg_path,
+    get_one,
     temp_bucket,
     perm_bucket,
     get_key,
@@ -109,6 +110,25 @@ def list(ctx: click.Context, perm:bool, index:int, n: int):
         click.echo(err)
     ctx.exit()
 
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("a_or_i", nargs=1, default="t1")
+@click.pass_context
+def get(ctx: click.Context, a_or_i: str):
+    """Get a message by alias or index.
+    
+    通过别名或索引获取一条消息 (打印到屏幕并复制到剪贴板), 默认获取 't1'。
+    
+    Example 1: txt get
+
+    Example 2: txt get p1
+
+    Example 3: txt get my-email
+    """
+    errMsg = get_one(a_or_i)
+    if errMsg:
+        click.echo(errMsg, err=True)
+    ctx.exit()
 
 # 初始化
 init_cfg()

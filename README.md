@@ -14,9 +14,9 @@ The CLI tool for ahui2016/txt
 - `txt list p1` 列出最近 n 条永久消息（默认 n = 9）
 - `txt list p3 -n 7` 从第 3 条永久消息开始，列出 5 条永久消息
 - `txt list --alias` 列出全部别名
-- `txt alias [index/alias] [alias]` 为一条消息设置别名
-- `txt search [keyword]` 搜索消息
+- `txt alias [index/alias] [alias]` 设置或删除别名
 - `txt delete [index/alias]` 删除一条消息
+- `txt search [keyword]` 查找消息
 
 - `txt getkey` 获取密钥（同时提示密钥状态），需要输入主密码
 - `txt getkey -gen/--generate` 生产新密钥，需要输入主密码

@@ -88,7 +88,7 @@ def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg
         return f"{r.status_code}: {r.text}"
 
     items = cast(list[TxtMsg], r.json())
-    if items is None:
+    if items is None or len(items) == 0:
         return "Not Found (找不到指定消息)"
 
     for item in items:
@@ -155,6 +155,7 @@ def toggle_cat(a_or_i: str) -> ErrMsg:
     printTxtMsg(msg)
     return None
 
+
 def delete_msg(a_or_i: str) -> ErrMsg:
     cfg = load_cfg()
     r = requests.post(
@@ -166,6 +167,7 @@ def delete_msg(a_or_i: str) -> ErrMsg:
 
     print("Deleted, and indexes are updated. (已删除，并且流水号已发生变化)")
     return None
+
 
 def set_alias(a_or_i: str, alias: str) -> ErrMsg:
     cfg = load_cfg()
@@ -181,3 +183,23 @@ def set_alias(a_or_i: str, alias: str) -> ErrMsg:
     else:
         err = get_one(a_or_i, copy=False)
     return err
+
+
+def search_msg(keyword: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/search"),
+        data=dict(keyword=keyword, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    items = cast(list[TxtMsg], r.json())
+    if items is None or len(items) == 0:
+        return "Not Found (找不到相关消息)"
+
+    items.sort(key=lambda x: x["ID"], reverse=True)
+    for item in items:
+        printTxtMsg(item)
+
+    return None

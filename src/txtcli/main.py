@@ -5,6 +5,7 @@ from txtcli.util import (
     delete_msg,
     get_aliases,
     get_one,
+    search_msg,
     send_msg,
     set_alias,
     temp_bucket,
@@ -230,7 +231,7 @@ def delete(ctx: click.Context, a_or_i: str):
 def alias(ctx: click.Context, delete: bool, args: tuple):
     """Set or delete the alias of a message.
 
-    设置或删除一条消息的别名。
+    设置或删除别名。
 
     [ARGS] 是两个字符串，第一个是流水号或旧别名，第二个是新别名。
 
@@ -251,6 +252,20 @@ def alias(ctx: click.Context, delete: bool, args: tuple):
         ctx.exit()
 
     errMsg = set_alias(args[0], args[1])
+    if errMsg:
+        click.echo(errMsg)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("keyword", nargs=1, required=True)
+@click.pass_context
+def search(ctx: click.Context, keyword: str):
+    """Search messages by a keyword. (查找消息)
+
+    Example: txt search hello (查找包含 'hello' 的消息)
+    """
+    errMsg = search_msg(keyword)
     if errMsg:
         click.echo(errMsg)
     ctx.exit()

@@ -7,6 +7,12 @@ The CLI tool for https://github.com/ahui2016/txt
 
 txt-cli 使用了 Python 3.10 的新特性，比如 type union operator, 因此，如果你的系统中未安装 Python 3.10, 推荐使用 [pyenv](https://github.com/pyenv/pyenv) 或 [miniconda](https://docs.conda.io/en/latest/miniconda.html) 来安装最新版本的 Python。
 
+例如，安装 miniconda 后，可以这样创建 3.10 环境：
+
+```sh
+$ conda create --name py310 python=3.10
+$ conda activate py310
+```
 
 ### 简单安装方法
 

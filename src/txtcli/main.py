@@ -3,6 +3,7 @@ import click
 from txtcli.util import (
     cfg_path,
     delete_msg,
+    gen_new_key,
     get_aliases,
     get_one,
     search_msg,
@@ -91,11 +92,19 @@ def server(ctx: click.Context, server_url: str):
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
+@click.option("gen", "-gen", "--generate", is_flag=True, help="generate a new key")
 @click.pass_context
-def getkey(ctx: click.Context):
-    """Get the secret key. (获取日常操作密钥)"""
+def getkey(ctx: click.Context, gen: bool):
+    """Get the current secret key, or generate a new key.
+    
+    获取日常操作密钥，或生成新的密钥。注意，一旦生成新密钥，旧密钥就失效。
+    """
     pwd = click.prompt("master password", hide_input=True)
-    errMsg = get_key(pwd)
+    if gen:
+        errMsg = gen_new_key(pwd)
+    else:
+        errMsg = get_key(pwd)
+
     if errMsg:
         click.echo(errMsg)
     ctx.exit()

@@ -61,6 +61,22 @@ def get_key(pwd: str) -> ErrMsg:
     return None
 
 
+def gen_new_key(pwd: str) -> ErrMsg:
+    cfg = load_cfg()
+    url = urljoin(cfg["server"], "/auth/gen-new-key")
+    r = requests.post(url, data={"password": pwd})
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    key = cast(SecretKey, r.json())
+    cfg["secret_key"] = key["Key"]
+    update_cfg(cfg)
+    keyStarts = arrow.get(key["Starts"]).format(DateFormat)
+    keyExpires = arrow.get(key["Expires"]).format(DateFormat)
+    print(f"生成新密钥, 有效期 {keyStarts} 至 {keyExpires} (注意，旧密钥已失效)")
+    return None
+
+
 def printTxtMsg(msg: TxtMsg) -> None:
     item_title = f'[{msg["Cat"][0]}{msg["Index"]}] [{msg["ID"]}]'
     if msg["Alias"]:

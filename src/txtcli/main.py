@@ -2,6 +2,7 @@ import click
 
 from txtcli.util import (
     cfg_path,
+    delete_msg,
     get_aliases,
     get_one,
     send_msg,
@@ -150,9 +151,9 @@ def list_command(ctx: click.Context, alias: bool, index: str, n: int):
 def get(ctx: click.Context, a_or_i: str):
     """Get a message by alias or index.
 
-    通过别名或索引获取一条消息 (打印到屏幕并复制到剪贴板), 默认获取 't1'。
+    通过别名或流水号获取一条消息 (打印到屏幕并复制到剪贴板), 默认获取 't1'。
 
-    [A_OR_I] 既可以是别名，也可以是索引。
+    [A_OR_I] 既可以是别名，也可以是流水号。
 
     Example 1: txt get
 
@@ -188,7 +189,7 @@ def toggle(ctx: click.Context, a_or_i: str):
 
     切换一条消息的类型 (暂存/永久), 默认把 T1 切换为 P1。
 
-    [A_OR_I] 既可以是别名，也可以是索引。
+    [A_OR_I] 既可以是别名，也可以是流水号。
 
     Example 1: txt toggle (把 t1 切换为永久消息)
 
@@ -203,6 +204,26 @@ def toggle(ctx: click.Context, a_or_i: str):
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("a_or_i", nargs=1, required=True)
+@click.pass_context
+def delete(ctx: click.Context, a_or_i: str):
+    """Delete a message. (删除一条消息)
+
+    [A_OR_I] 既可以是别名，也可以是流水号。
+
+    Example 1: txt delete t2 (删除t2)
+
+    Example 2: txt delete p1 (删除p1)
+
+    Example 3: txt delete my-email (删除别名为 my-email 的消息)
+    """
+    errMsg = delete_msg(a_or_i)
+    if errMsg:
+        click.echo(errMsg)
+    ctx.exit()
+
+
+@cli.command(context_settings=CONTEXT_SETTINGS)
 @click.option("delete", "--delete", is_flag=True, help="delete the alias")
 @click.argument("args", nargs=-1, required=True)
 @click.pass_context
@@ -211,7 +232,7 @@ def alias(ctx: click.Context, delete: bool, args: tuple):
 
     设置或删除一条消息的别名。
 
-    [ARGS] 是两个字符串，第一个是索引或旧别名，第二个是新别名。
+    [ARGS] 是两个字符串，第一个是流水号或旧别名，第二个是新别名。
 
     Example 1: txt alias t1 my-email (把 't1' 的别名设为 'my-email')
 

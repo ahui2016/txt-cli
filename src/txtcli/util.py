@@ -155,6 +155,17 @@ def toggle_cat(a_or_i: str) -> ErrMsg:
     printTxtMsg(msg)
     return None
 
+def delete_msg(a_or_i: str) -> ErrMsg:
+    cfg = load_cfg()
+    r = requests.post(
+        urljoin(cfg["server"], "/cli/delete"),
+        data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
+    )
+    if r.status_code != 200:
+        return f"{r.status_code}: {r.text}"
+
+    print("Deleted, and indexes are updated. (已删除，并且流水号已发生变化)")
+    return None
 
 def set_alias(a_or_i: str, alias: str) -> ErrMsg:
     cfg = load_cfg()

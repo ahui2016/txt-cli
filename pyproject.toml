@@ -13,6 +13,7 @@ dependencies = [
   "click",
   "appdirs",
   "pyperclip",
+  "requests",
 ]
 requires-python = ">=3.9"
 dynamic = ["version", "description"]

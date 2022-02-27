@@ -79,3 +79,7 @@ pipx upgrade txtcli
 
 - `txt -h` （命令列表）
 - `txt getkey -h` （每个子命令都有帮助信息）
+
+### 复制失败
+
+复制到剪贴板的功能由 pyperclip 实现，如果复制失败，请看这里 [https://pyperclip.readthedocs.io/en/latest/#not-implemented-error](https://pyperclip.readthedocs.io/en/latest/#not-implemented-error)

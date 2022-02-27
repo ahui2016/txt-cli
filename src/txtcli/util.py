@@ -124,7 +124,10 @@ def get_one(a_or_i: str, copy: bool = True) -> ErrMsg:
 
     item = cast(TxtMsg, r.json())
     if copy:
-        pyperclip.copy(item["Msg"])
+        try:
+            pyperclip.copy(item["Msg"])
+        except Exception:
+            pass
         print(item["Msg"])
     else:
         printTxtMsg(item)

@@ -83,3 +83,10 @@ pipx upgrade txtcli
 ### 复制失败
 
 复制到剪贴板的功能由 pyperclip 实现，如果复制失败，请看这里 [https://pyperclip.readthedocs.io/en/latest/#not-implemented-error](https://pyperclip.readthedocs.io/en/latest/#not-implemented-error)
+
+
+## 一个技巧
+
+- `txt get` 可以获取最新一条消息，假设其内容是 "ls -lh", 那么，使用 `bash <(txt get)` 的形式可以执行命令 "ls -lh"
+- 一般先执行 `txt get`, 检查内容没问题后再执行 `bash <(txt get)`, 可以避免复制黏贴的麻烦。
+- 另外，使用 `txt get > aaa.txt` 的方式可以把内容写到一个文本文件中。

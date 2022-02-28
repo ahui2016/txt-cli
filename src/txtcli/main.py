@@ -1,4 +1,5 @@
 import click
+from txtcli.model import ErrMsg
 
 from txtcli.util import (
     cfg_path,
@@ -25,6 +26,13 @@ from . import (
 )
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
+
+
+def check(ctx: click.Context, errMsg: ErrMsg) -> None:
+    """检查 err, 有错误则打印并终止程序，无错误则什么都不用做。"""
+    if errMsg:
+        click.echo(f"Error: {errMsg}", err=True)
+        ctx.exit()
 
 
 def invalid_index(ctx: click.Context, index: str):
@@ -65,10 +73,9 @@ def cli(ctx: click.Context):
     https://pypi.org/project/txtcli/
     """
     if ctx.invoked_subcommand is None:
-        errMsg = get_txt()
-        if errMsg:
-            click.echo(errMsg)
-        ctx.exit()
+        check(ctx, get_txt())
+
+    ctx.exit()
 
 
 # 以上是主命令
@@ -96,7 +103,7 @@ def server(ctx: click.Context, server_url: str):
 @click.pass_context
 def getkey(ctx: click.Context, gen: bool):
     """Get the current secret key, or generate a new key.
-    
+
     获取日常操作密钥，或生成新的密钥。注意，一旦生成新密钥，旧密钥就失效。
     """
     pwd = click.prompt("master password", hide_input=True)
@@ -105,8 +112,7 @@ def getkey(ctx: click.Context, gen: bool):
     else:
         errMsg = get_key(pwd)
 
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, errMsg)
     ctx.exit()
 
 
@@ -129,9 +135,7 @@ def list_command(ctx: click.Context, alias: bool, index: str, n: int):
     Example 4: txt list --alias (列出全部别名)
     """
     if alias:
-        errMsg = get_aliases()
-        if errMsg:
-            click.echo(errMsg)
+        check(ctx, get_aliases())
         ctx.exit()
 
     if len(index) < 2:
@@ -149,9 +153,7 @@ def list_command(ctx: click.Context, alias: bool, index: str, n: int):
     except ValueError:
         invalid_index(ctx, index)
 
-    errMsg = get_txt(bucket, i, n)
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, get_txt(bucket, i, n))
     ctx.exit()
 
 
@@ -171,9 +173,7 @@ def get(ctx: click.Context, a_or_i: str):
 
     Example 3: txt get my-email
     """
-    errMsg = get_one(a_or_i)
-    if errMsg:
-        click.echo(errMsg, err=True)
+    check(ctx, get_one(a_or_i))
     ctx.exit()
 
 
@@ -185,9 +185,7 @@ def send(ctx: click.Context, msg: str):
 
     Example: txt send "Hello world!"
     """
-    errMsg = send_msg(msg)
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, send_msg(msg))
     ctx.exit()
 
 
@@ -207,9 +205,7 @@ def toggle(ctx: click.Context, a_or_i: str):
 
     Example 3: txt toggle my-email (切换别名为 my-email 的类型)
     """
-    errMsg = toggle_cat(a_or_i)
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, toggle_cat(a_or_i))
     ctx.exit()
 
 
@@ -227,9 +223,7 @@ def delete(ctx: click.Context, a_or_i: str):
 
     Example 3: txt delete my-email (删除别名为 my-email 的消息)
     """
-    errMsg = delete_msg(a_or_i)
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, delete_msg(a_or_i))
     ctx.exit()
 
 
@@ -260,9 +254,7 @@ def alias(ctx: click.Context, delete: bool, args: tuple):
         click.echo("Error: Argument 'args' takes 2 values.")
         ctx.exit()
 
-    errMsg = set_alias(args[0], args[1])
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, set_alias(args[0], args[1]))
     ctx.exit()
 
 
@@ -274,9 +266,7 @@ def search(ctx: click.Context, keyword: str):
 
     Example: txt search hello (查找包含 'hello' 的消息)
     """
-    errMsg = search_msg(keyword)
-    if errMsg:
-        click.echo(errMsg)
+    check(ctx, search_msg(keyword))
     ctx.exit()
 
 

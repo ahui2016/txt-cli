@@ -74,8 +74,7 @@ def cli(ctx: click.Context):
     """
     if ctx.invoked_subcommand is None:
         check(ctx, get_txt())
-
-    ctx.exit()
+        ctx.exit()
 
 
 # 以上是主命令

@@ -87,12 +87,15 @@ def printTxtMsg(msg: TxtMsg) -> None:
     print()
 
 
-def get_txt(bucket: str = temp_bucket, index: int = 1, limit: int = 0) -> ErrMsg:
+def get_txt(bucket: str = "", index: int = 1, limit: int = 0) -> ErrMsg:
     cfg = load_cfg()
     if index <= 1:
         index = 1
     if limit <= 0:
-        limit = cfg["txt_default"]
+        if bucket:
+            limit = cfg["txt_list_default"]
+        else:
+            limit = cfg["txt_default"]
     if bucket != perm_bucket:
         bucket = temp_bucket
 

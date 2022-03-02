@@ -60,6 +60,8 @@ pipx upgrade txtcli
 - `txt next` 列出后续 5 条消息（暂时不做这个功能）
 - `txt get [index/alias]` 通过 index 或别名获取(复制，同时打印到屏幕)一条消息，默认获取 T1
 - `txt send [message]` 发送消息 (添加暂存消息)
+- `txt send` 默认发送系统剪贴板的内容
+- `txt send -f ./file.txt` 发送文件内容
 - `txt toggle [index/alias]` 切换一条消息的类型(暂存/永久), 默认把 T1 切换为 P1
 - `txt list -n 3` 列出最近 3 条暂存消息（默认 n = 9）
 - `txt list p1` 列出最近 n 条永久消息（默认 n = 9）
@@ -79,7 +81,7 @@ pipx upgrade txtcli
 
 其中，`index` 是消息的流水号，每当添加消息、删除消息、转换状态时都会导致流水号发生变化，以 T 开头的流水号表示暂存消息，以 P 开头表示永久消息，比如 `T1` 表示最新一条暂存消息, `P3` 表示第 3 条永久消息，其中 T/P 不分大小写。
 
-`alias` 是消息的别名，一个别名只能对应一条消息。不可采用“以 T 或 P 开头紧跟数字”的形式（要避免与 index 冲突）。
+`alias` 是消息的别名，一个别名只能对应一条消息。不可采用“以 T 或 P 开头紧跟数字”的形式（为了避免与 index 冲突）。
 
 ### Help (帮助)
 
@@ -96,3 +98,12 @@ pipx upgrade txtcli
 - `txt get` 可以获取最新一条消息，假设其内容是 "ls -lh", 那么，使用 `bash <(txt get)` 的形式可以执行命令 "ls -lh"
 - 一般先执行 `txt get`, 检查内容没问题后再执行 `bash <(txt get)`, 可以避免复制黏贴的麻烦。
 - 另外，使用 `txt get > aaa.txt` 的方式可以把内容写到一个文本文件中。
+
+
+## 更新日志
+
+### v0.0.8
+
+- **add** `txt send` 默认发送系统剪贴板的内容，好处是方便，而且不用担心字符转义的问题。
+- **change** `txt send Hello World!` 多数情况下不需要加双引号把句子包裹起来。但要注意字符转义的问题。例如 `txt send He said: "Hello World!"` 会被转义成 `He said: Hello World!` (半角双引号不见了)。
+- **add** 对于遇到字符转义问题，并且无法读取系统剪贴板的情况，还可以用 `txt send -f ./file.txt` 的方式发送文件内容。

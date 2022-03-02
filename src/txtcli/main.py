@@ -1,4 +1,5 @@
 import click
+import pyperclip
 from txtcli.model import ErrMsg
 
 from txtcli.util import (
@@ -177,13 +178,32 @@ def get(ctx: click.Context, a_or_i: str):
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
-@click.argument("msg", nargs=1, required=True)
+@click.option("filename", "-f", "--file", type=click.Path(exists=True), help="Send the content of the file.")
+@click.argument("msg", nargs=-1)
 @click.pass_context
-def send(ctx: click.Context, msg: str):
+def send(ctx: click.Context, msg: str, filename: str):
     """Send a message. (发送一条消息)
+    
+    Example 1: txt send  (默认发送系统剪贴板的内容)
 
-    Example: txt send "Hello world!"
+    Example 2: txt send Hello world!
+
+    Example 3: txt send -f ./file.txt (发送文件内容)
     """
+    if filename:
+        with open(filename, "r", encoding='utf-8') as f:
+            msg = f.read()
+        check(ctx, send_msg(msg))
+        ctx.exit()
+
+    if msg:
+        msg = " ".join(msg).strip()
+    else:
+        try:
+            msg = pyperclip.paste()
+        except Exception:
+            pass
+    
     check(ctx, send_msg(msg))
     ctx.exit()
 

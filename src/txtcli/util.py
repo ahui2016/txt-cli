@@ -173,8 +173,7 @@ def toggle_cat(a_or_i: str) -> ErrMsg:
     if r.status_code != 200:
         return f"{r.status_code}: {r.text}"
 
-    msg = cast(TxtMsg, r.json())
-    printTxtMsg(msg)
+    print("OK. Indexes are changed. (注意，流水号已发生变化)")
     return None
 
 

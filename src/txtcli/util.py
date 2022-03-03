@@ -42,6 +42,13 @@ def update_cfg(cfg: TxtConfig) -> None:
         json.dump(cfg, f, indent=4, ensure_ascii=False)
 
 
+def forget_key() -> None:
+    cfg = load_cfg()
+    cfg["secret_key"] = ""
+    update_cfg(cfg)
+    print("OK. 已清除密钥。")
+
+
 def get_key(pwd: str) -> ErrMsg:
     cfg = load_cfg()
     url = urljoin(cfg["server"], "/auth/get-current-key")

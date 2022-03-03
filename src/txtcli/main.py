@@ -5,6 +5,7 @@ from txtcli.model import ErrMsg
 from txtcli.util import (
     cfg_path,
     delete_msg,
+    forget_key,
     gen_new_key,
     get_aliases,
     get_one,
@@ -100,12 +101,17 @@ def server(ctx: click.Context, server_url: str):
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
 @click.option("gen", "-gen", "--generate", is_flag=True, help="generate a new key")
+@click.option("forget", "-forget", "--forget-key", is_flag=True, help="forget the key")
 @click.pass_context
-def getkey(ctx: click.Context, gen: bool):
+def getkey(ctx: click.Context, gen: bool, forget: bool):
     """Get the current secret key, or generate a new key.
 
     获取日常操作密钥，或生成新的密钥。注意，一旦生成新密钥，旧密钥就失效。
     """
+    if forget:
+        forget_key()
+        ctx.exit()
+
     pwd = click.prompt("master password", hide_input=True)
     if gen:
         errMsg = gen_new_key(pwd)

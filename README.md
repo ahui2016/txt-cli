@@ -75,6 +75,7 @@ pipx upgrade txtcli
 
 - `txt getkey` 获取密钥（同时提示密钥状态），需要输入主密码
 - `txt getkey -gen/--generate` 生产新密钥，需要输入主密码
+- `txt getkey -forget` 清除密钥（需要重新获取密钥才能正常使用）
 - `txt changepwd` 更改主密码 (暂时不做这个功能)
 - `txt server` 查看当前服务器地址
 - `txt server -set [url]` 修改服务器地址
@@ -102,8 +103,17 @@ pipx upgrade txtcli
 
 ## 更新日志
 
+### v0.0.9 
+
+- **add** `txt getkey -forget` 清除密钥，相当于登出，需要重新获取密钥才能正常使用
+
 ### v0.0.8
 
 - **add** `txt send` 默认发送系统剪贴板的内容，好处是方便，而且不用担心字符转义的问题。
 - **change** `txt send Hello World!` 多数情况下不需要加双引号把句子包裹起来。但要注意字符转义的问题。例如 `txt send He said: "Hello World!"` 会被转义成 `He said: Hello World!` (半角双引号不见了)。
 - **add** 对于遇到字符转义问题，并且无法读取系统剪贴板的情况，还可以用 `txt send -f ./file.txt` 的方式发送文件内容。
+
+
+## Todo
+
+- 二维码

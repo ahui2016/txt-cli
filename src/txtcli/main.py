@@ -202,7 +202,10 @@ def send(ctx: click.Context, gui:bool, msg: str, filename: str):
     Example 3: txt send -f ./file.txt (发送文件内容)
     """
     if gui:
-        check(ctx, tk_send_msg())
+        try:
+            check(ctx, tk_send_msg())
+        except Exception:
+            pass
         ctx.exit()
 
     if filename:

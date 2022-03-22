@@ -61,6 +61,7 @@ pipx upgrade txtcli
 - `txt get [index/alias]` 通过 index 或别名获取(复制，同时打印到屏幕)一条消息，默认获取 T1
 - `txt send [message]` 发送消息 (添加暂存消息)
 - `txt send` 默认发送系统剪贴板的内容
+- `txt send -g` 打开 GUI 窗口发送消息
 - `txt send -f ./file.txt` 发送文件内容
 - `txt toggle [index/alias]` 切换一条消息的类型(暂存/永久), 默认把 T1 切换为 P1
 - `txt list -n 3` 列出最近 3 条暂存消息（默认 n = 9）
@@ -103,7 +104,11 @@ pipx upgrade txtcli
 
 ## 更新日志
 
-### v0.0.9 
+### v0.1.0
+
+- **add** `txt send -g/--gui` 打开 GUI 窗口发送消息，可方便地避免字符转义问题。
+
+### v0.0.9
 
 - **add** `txt getkey -forget` 清除密钥，相当于登出，需要重新获取密钥才能正常使用
 

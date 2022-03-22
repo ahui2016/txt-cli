@@ -1,5 +1,6 @@
 import click
 import pyperclip
+from txtcli.gui import tk_send_msg
 from txtcli.model import ErrMsg
 
 from txtcli.util import (
@@ -56,6 +57,7 @@ def show_where(ctx: click.Context, _, value):
 @click.version_option(
     __version__,
     "-v",
+    "-V",
     "--version",
     package_name=__package_name__,
     message="%(prog)s version: %(version)s",
@@ -184,18 +186,25 @@ def get(ctx: click.Context, a_or_i: str):
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
+@click.option(
+    "gui", "-g", "--gui", is_flag=True, help="Open a GUI window for text input."
+)
 @click.option("filename", "-f", "--file", type=click.Path(exists=True), help="Send the content of the file.")
 @click.argument("msg", nargs=-1)
 @click.pass_context
-def send(ctx: click.Context, msg: str, filename: str):
+def send(ctx: click.Context, gui:bool, msg: str, filename: str):
     """Send a message. (发送一条消息)
     
     Example 1: txt send  (默认发送系统剪贴板的内容)
 
-    Example 2: txt send Hello world!
+    Example 2: txt send Hello world! (发送 'Hello world!')
 
     Example 3: txt send -f ./file.txt (发送文件内容)
     """
+    if gui:
+        check(ctx, tk_send_msg())
+        ctx.exit()
+
     if filename:
         with open(filename, "r", encoding='utf-8') as f:
             msg = f.read()

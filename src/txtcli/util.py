@@ -19,6 +19,10 @@ app_config_dir = Path(app_dirs.user_config_dir)
 cfg_path = app_config_dir.joinpath(cfg_file_name)
 
 
+def postTimeout(url: str, data: dict) -> requests.Response:
+    return requests.post(url, data=data, timeout=3)
+
+
 def init_cfg() -> None:
     app_config_dir.mkdir(parents=True, exist_ok=True)
     if not cfg_path.exists():
@@ -52,7 +56,7 @@ def forget_key() -> None:
 def get_key(pwd: str) -> ErrMsg:
     cfg = load_cfg()
     url = urljoin(cfg["server"], "/auth/get-current-key")
-    r = requests.post(url, data={"password": pwd})
+    r = postTimeout(url, data={"password": pwd})
     if r.status_code != 200:
         return f"{r.status_code}: {r.text}"
 
@@ -71,7 +75,7 @@ def get_key(pwd: str) -> ErrMsg:
 def gen_new_key(pwd: str) -> ErrMsg:
     cfg = load_cfg()
     url = urljoin(cfg["server"], "/auth/gen-new-key")
-    r = requests.post(url, data={"password": pwd})
+    r = postTimeout(url, data={"password": pwd})
     if r.status_code != 200:
         return f"{r.status_code}: {r.text}"
 
@@ -94,8 +98,7 @@ def printTxtMsg(msg: TxtMsg) -> None:
     print()
 
 
-def get_txt(bucket: str = "", index: int = 1, limit: int = 0) -> ErrMsg:
-    cfg = load_cfg()
+def get_txt(cfg:TxtConfig,bucket: str = "", index: int = 1, limit: int = 0) -> ErrMsg:
     if index <= 1:
         index = 1
     if limit <= 0:
@@ -106,7 +109,7 @@ def get_txt(bucket: str = "", index: int = 1, limit: int = 0) -> ErrMsg:
     if bucket != perm_bucket:
         bucket = temp_bucket
 
-    r = requests.post(
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/get-more-items"),
         data=dict(bucket=bucket, index=index, limit=limit, password=cfg["secret_key"]),
     )
@@ -123,9 +126,8 @@ def get_txt(bucket: str = "", index: int = 1, limit: int = 0) -> ErrMsg:
     return None
 
 
-def get_one(a_or_i: str, copy: bool = True) -> ErrMsg:
-    cfg = load_cfg()
-    r = requests.post(
+def get_one(cfg: TxtConfig, a_or_i: str, copy: bool = True) -> ErrMsg:
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/get-by-a-or-i"),
         data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
     )
@@ -144,9 +146,8 @@ def get_one(a_or_i: str, copy: bool = True) -> ErrMsg:
     return None
 
 
-def get_aliases() -> ErrMsg:
-    cfg = load_cfg()
-    r = requests.post(
+def get_aliases(cfg:TxtConfig) -> ErrMsg:
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/get-all-aliases"),
         data=dict(password=cfg["secret_key"]),
     )
@@ -161,19 +162,19 @@ def get_aliases() -> ErrMsg:
 
 def send_msg(msg: str) -> ErrMsg:
     cfg = load_cfg()
-    r = requests.post(
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/add"),
         data=dict(msg=msg, password=cfg["secret_key"]),
     )
     if r.status_code != 200:
         return f"{r.status_code}: {r.text}"
 
-    return get_txt(limit=1)
+    return get_txt(cfg, limit=1)
 
 
 def toggle_cat(a_or_i: str) -> ErrMsg:
     cfg = load_cfg()
-    r = requests.post(
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/toggle-category"),
         data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
     )
@@ -184,9 +185,8 @@ def toggle_cat(a_or_i: str) -> ErrMsg:
     return None
 
 
-def delete_msg(a_or_i: str) -> ErrMsg:
-    cfg = load_cfg()
-    r = requests.post(
+def delete_msg(cfg: TxtConfig, a_or_i: str) -> ErrMsg:
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/delete"),
         data=dict(a_or_i=a_or_i, password=cfg["secret_key"]),
     )
@@ -197,9 +197,8 @@ def delete_msg(a_or_i: str) -> ErrMsg:
     return None
 
 
-def set_alias(a_or_i: str, alias: str) -> ErrMsg:
-    cfg = load_cfg()
-    r = requests.post(
+def set_alias(cfg: TxtConfig, a_or_i: str, alias: str) -> ErrMsg:
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/set-alias"),
         data=dict(a_or_i=a_or_i, alias=alias, password=cfg["secret_key"]),
     )
@@ -207,15 +206,15 @@ def set_alias(a_or_i: str, alias: str) -> ErrMsg:
         return f"{r.status_code}: {r.text}"
 
     if alias:
-        err = get_one(alias, copy=False)
+        err = get_one(cfg, alias, copy=False)
     else:
-        err = get_one(a_or_i, copy=False)
+        err = get_one(cfg, a_or_i, copy=False)
     return err
 
 
 def search_msg(keyword: str) -> ErrMsg:
     cfg = load_cfg()
-    r = requests.post(
+    r = postTimeout(
         urljoin(cfg["server"], "/cli/search"),
         data=dict(keyword=keyword, password=cfg["secret_key"]),
     )

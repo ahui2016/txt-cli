@@ -31,7 +31,6 @@ def get_text(form_input: tk.Entry | tk.Text) -> str:
         return ""
 
 
-
 def tk_send_msg() -> ErrMsg:
     window = create_window_center("Send - txt")
 
@@ -49,7 +48,7 @@ def tk_send_msg() -> ErrMsg:
         window.quit()
         return send_msg(msg)
 
-    post_btn = tk.Button(master=frame, text="Post", command=btn_click)
+    post_btn = tk.Button(master=frame, text="Send", command=btn_click)
     post_btn.pack(side=tk.RIGHT, padx=5, pady=5, ipadx=5)
 
     cancel_btn = tk.Button(master=frame, text="Cancel", command=window.quit)

@@ -77,7 +77,8 @@ def cli(ctx: click.Context):
     https://pypi.org/project/txtcli/
     """
     if ctx.invoked_subcommand is None:
-        check(ctx, get_txt())
+        cfg = load_cfg()
+        check(ctx, get_txt(cfg))
         ctx.exit()
 
 
@@ -142,8 +143,10 @@ def list_command(ctx: click.Context, alias: bool, index: str, n: int):
 
     Example 4: txt list --alias (列出全部别名)
     """
+    cfg = load_cfg()
+
     if alias:
-        check(ctx, get_aliases())
+        check(ctx, get_aliases(cfg))
         ctx.exit()
 
     if len(index) < 2:
@@ -161,7 +164,7 @@ def list_command(ctx: click.Context, alias: bool, index: str, n: int):
     except ValueError:
         invalid_index(ctx, index)
 
-    check(ctx, get_txt(bucket, i, n))
+    check(ctx, get_txt(cfg, bucket, i, n))
     ctx.exit()
 
 
@@ -181,7 +184,8 @@ def get(ctx: click.Context, a_or_i: str):
 
     Example 3: txt get my-email
     """
-    check(ctx, get_one(a_or_i))
+    cfg = load_cfg()
+    check(ctx, get_one(cfg, a_or_i))
     ctx.exit()
 
 
@@ -189,12 +193,18 @@ def get(ctx: click.Context, a_or_i: str):
 @click.option(
     "gui", "-g", "--gui", is_flag=True, help="Open a GUI window for text input."
 )
-@click.option("filename", "-f", "--file", type=click.Path(exists=True), help="Send the content of the file.")
+@click.option(
+    "filename",
+    "-f",
+    "--file",
+    type=click.Path(exists=True),
+    help="Send the content of the file.",
+)
 @click.argument("msg", nargs=-1)
 @click.pass_context
-def send(ctx: click.Context, gui:bool, msg: str, filename: str):
+def send(ctx: click.Context, gui: bool, msg: str, filename: str):
     """Send a message. (发送一条消息)
-    
+
     Example 1: txt send  (默认发送系统剪贴板的内容)
 
     Example 2: txt send Hello world! (发送 'Hello world!')
@@ -209,7 +219,7 @@ def send(ctx: click.Context, gui:bool, msg: str, filename: str):
         ctx.exit()
 
     if filename:
-        with open(filename, "r", encoding='utf-8') as f:
+        with open(filename, "r", encoding="utf-8") as f:
             msg = f.read()
         check(ctx, send_msg(msg))
         ctx.exit()
@@ -221,7 +231,7 @@ def send(ctx: click.Context, gui:bool, msg: str, filename: str):
             msg = pyperclip.paste()
         except Exception:
             pass
-    
+
     check(ctx, send_msg(msg))
     ctx.exit()
 
@@ -260,7 +270,10 @@ def delete(ctx: click.Context, a_or_i: str):
 
     Example 3: txt delete my-email (删除别名为 my-email 的消息)
     """
-    check(ctx, delete_msg(a_or_i))
+    cfg = load_cfg()
+    check(ctx, get_one(cfg, a_or_i, False))
+    click.confirm("Confirm deletion (确认删除，不可恢复)", abort=True)
+    check(ctx, delete_msg(cfg, a_or_i))
     ctx.exit()
 
 
@@ -291,7 +304,8 @@ def alias(ctx: click.Context, delete: bool, args: tuple):
         click.echo("Error: Argument 'args' takes 2 values.")
         ctx.exit()
 
-    check(ctx, set_alias(args[0], args[1]))
+    cfg = load_cfg()
+    check(ctx, set_alias(cfg, args[0], args[1]))
     ctx.exit()
 
 

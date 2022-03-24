@@ -56,17 +56,19 @@ pipx upgrade txtcli
 
 ### 基本功能
 
-- `txt` 列出最近 5 条暂存消息
-- `txt next` 列出后续 5 条消息（暂时不做这个功能）
-- `txt get [index/alias]` 通过 index 或别名获取(复制，同时打印到屏幕)一条消息，默认获取 T1
 - `txt send [message]` 发送消息 (添加暂存消息)
 - `txt send` 默认发送系统剪贴板的内容
 - `txt send -g` 打开 GUI 窗口发送消息
 - `txt send -f ./file.txt` 发送文件内容
 - `txt toggle [index/alias]` 切换一条消息的类型(暂存/永久), 默认把 T1 切换为 P1
+
+- `txt` 相当于 'txt list'
+- `txt list` 列出最近几条暂存消息
 - `txt list -n 3` 列出最近 3 条暂存消息（默认 n = 9）
 - `txt list p1` 列出最近 n 条永久消息（默认 n = 9）
 - `txt list p3 -n 7` 从第 3 条永久消息开始，列出 5 条永久消息
+- `txt get [index/alias]` 通过 index 或别名获取(复制，同时打印到屏幕)一条消息，默认获取 T1
+
 - `txt list --alias` 列出全部别名
 - `txt alias [index/alias] [alias]` 设置或删除别名
 - `txt delete [index/alias]` 删除一条消息
@@ -103,6 +105,10 @@ pipx upgrade txtcli
 
 
 ## 更新日志
+
+### v0.1.1
+
+- **add** `txt delete` 删除时有 y/n 确认。
 
 ### v0.1.0
 

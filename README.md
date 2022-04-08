@@ -69,7 +69,8 @@ pipx upgrade txtcli
 - `txt list p3 -n 7` 从第 3 条永久消息开始，列出 5 条永久消息
 - `txt get [index/alias]` 通过 index 或别名获取(复制，同时打印到屏幕)一条消息，默认获取 T1
 
-- `txt list --alias` 列出全部别名
+- `txt list -a/--alias` 列出全部别名
+- `txt alias -l/--list` 列出全部别名
 - `txt alias [index/alias] [alias]` 设置或删除别名
 - `txt delete [index/alias]` 删除一条消息
 - `txt search [keyword]` 查找消息
@@ -105,6 +106,10 @@ pipx upgrade txtcli
 
 
 ## 更新日志
+
+### v0.1.2
+
+- **add** `txt alias -l/--list` 列出全部别名
 
 ### v0.1.1
 

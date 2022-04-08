@@ -20,7 +20,7 @@ cfg_path = app_config_dir.joinpath(cfg_file_name)
 
 
 def postTimeout(url: str, data: dict) -> requests.Response:
-    return requests.post(url, data=data, timeout=3)
+    return requests.post(url, data=data, timeout=5)
 
 
 def init_cfg() -> None:

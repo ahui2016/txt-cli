@@ -278,22 +278,30 @@ def delete(ctx: click.Context, a_or_i: str):
 
 
 @cli.command(context_settings=CONTEXT_SETTINGS)
+@click.option("alias_list", "-l", "--list", is_flag=True, help="show all aliases")
 @click.option("delete", "--delete", is_flag=True, help="delete the alias")
-@click.argument("args", nargs=-1, required=True)
+@click.argument("args", nargs=-1)
 @click.pass_context
-def alias(ctx: click.Context, delete: bool, args: tuple):
+def alias(ctx: click.Context, alias_list:bool, delete: bool, args: tuple):
     """Set or delete the alias of a message.
 
     设置或删除别名。
 
     [ARGS] 是两个字符串，第一个是流水号或旧别名，第二个是新别名。
 
-    Example 1: txt alias t1 my-email (把 't1' 的别名设为 'my-email')
+    Examples:
 
-    Example 2: txt alias my-email email (把别名 'my-email' 改为 'email')
+    txt alias t1 my-email (把 't1' 的别名设为 'my-email')
 
-    Example 3: txt alias --delete email (删除别名 'email')
+    txt alias my-email email (把别名 'my-email' 改为 'email')
+
+    txt alias --delete email (删除别名 'email')
     """
+    cfg = load_cfg()
+    if alias_list:
+        check(ctx, get_aliases(cfg))
+        ctx.exit()
+
     if delete:
         if args and len(args) != 1:
             click.echo("Error: Argument 'args' takes 1 value when use with '--delete'.")
@@ -301,10 +309,9 @@ def alias(ctx: click.Context, delete: bool, args: tuple):
         args = (args[0], "")
 
     if len(args) != 2:
-        click.echo("Error: Argument 'args' takes 2 values.")
+        click.echo("Error: Argument 'ARGS' takes 2 values.")
         ctx.exit()
 
-    cfg = load_cfg()
     check(ctx, set_alias(cfg, args[0], args[1]))
     ctx.exit()
 

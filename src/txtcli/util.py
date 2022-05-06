@@ -28,7 +28,7 @@ def init_cfg() -> None:
     if not cfg_path.exists():
         with open(cfg_path, "w", encoding="utf-8") as f:
             cfg = TxtConfig(
-                server="https://txt-demo.ai42.xyz",
+                server="https://txt-demo.ai42.cc",
                 secret_key="",
                 txt_default=5,
                 txt_list_default=9,

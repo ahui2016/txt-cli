@@ -1,6 +1,6 @@
 # txt-cli
 
-The CLI tool for https://github.com/ahui2016/txt
+The CLI tool for <https://github.com/ahui2016/txt>
 
 
 ## Install (安装)
@@ -10,7 +10,7 @@ txt-cli 使用了 Python 3.10 的新特性，比如 type union operator, 因此�
 例如，安装 miniconda 后，可以这样创建 3.10 环境：
 
 ```sh
-$ conda create --name py310 python=3.10
+$ conda create --name py310 python=3.10.4
 $ conda activate py310
 ```
 
@@ -28,28 +28,13 @@ pip install txtcli
 pip install -U txtcli
 ```
 
-### 另一种安装方法
-
-另外，还可以使用 pipx 来安装, pipx 会自动为 txt-cli 创建一个虚拟环境，不会污染系统环境，并且使用时不用管理虚拟环境。推荐大家多了解一下 pipx。
-
-pipx 的介绍及安装方法: https://pypa.github.io/pipx/ 安装 pipx 后执行以下命令即可：
-
-```sh
-pipx install txtcli
-```
-
-升级：
-
-```sh
-pipx upgrade txtcli
-```
-
 ### Server and the secret-key (服务器地址与密钥)
 
 - 安装后，默认已设置了演示版的服务器地址，可使用命令 `txt getkey`, 输入主密码(abc) 即可获取日常操作密钥。
 - 执行 `txt getkey` 后如无错误，即可正常使用。
 - 如果密钥过期，可使用命令 `txt getkey -gen` 生产新密钥。
 - 如果你有自己的服务器，可使用命令 `txt server -set [url]` 修改服务器地址。
+- 注意：使用密码 abc 连接自带的演示版服务器，只是演示用途，正式使用时你还需要安装这个 → <https://github.com/ahui2016/txt>
 
 
 ## Features (功能)
@@ -128,8 +113,3 @@ pipx upgrade txtcli
 - **add** `txt send` 默认发送系统剪贴板的内容，好处是方便，而且不用担心字符转义的问题。
 - **change** `txt send Hello World!` 多数情况下不需要加双引号把句子包裹起来。但要注意字符转义的问题。例如 `txt send He said: "Hello World!"` 会被转义成 `He said: Hello World!` (半角双引号不见了)。
 - **add** 对于遇到字符转义问题，并且无法读取系统剪贴板的情况，还可以用 `txt send -f ./file.txt` 的方式发送文件内容。
-
-
-## Todo
-
-- 二维码
